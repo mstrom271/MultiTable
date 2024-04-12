@@ -1,0 +1,297 @@
+name: Build
+
+on:
+  push:
+
+jobs:
+  build_android_arm64:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26c
+          add-to-path: true
+          local-cache: true
+      - name: Install Host Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '6.6.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action'
+          modules: 'qtmultimedia'
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '6.6.2'
+          host: 'linux'
+          target: 'android'
+          arch: 'android_arm64_v8a'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action'
+          modules: 'qtmultimedia'
+      - name: Install Conan
+        id: conan
+        uses: turtlebrowser/get-conan@main
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+          ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          ANDROID_KEYALIAS: ${{ secrets.ANDROID_KEYALIAS }}
+          ANDROID_KEYALIAS_PASS: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+        run: |
+          env && echo "-----------------------------"
+
+          set +x
+          echo "$ANDROID_KEYSTORE" | base64 --decode > /tmp/android_release.keystore
+          export ANDROID_KEYSTORE_FILE=/tmp/android_release.keystore
+          export ANDROID_KEYSTORE_PASS="$ANDROID_KEYSTORE_PASS"
+          export ANDROID_KEYALIAS="$ANDROID_KEYALIAS"
+          export ANDROID_KEYALIAS_PASS="$ANDROID_KEYALIAS_PASS"
+          set -x
+
+          export OS=Android
+          export ABI=armv8
+          export BUILD_TYPE=Release
+          export STAGE=All
+          export API_LEVEL=33
+          sudo apt-get update && sudo apt-get install -y apksigner
+          ./build.sh
+          source config.h.sh
+          export ANDROID_KEYSTORE=""
+          export ANDROID_KEYSTORE_PASS=""
+          export ANDROID_KEYALIAS=""
+          export ANDROID_KEYALIAS_PASS=""
+
+          export FINAL_NAME=${PROJECT_NAME}_${PROJECT_VERSION}_${OS}_${ABI}.apk
+          mv ./build/$OS/$ABI/$BUILD_TYPE/android-build/$PROJECT_NAME.apk \
+             ./build/$OS/$ABI/$BUILD_TYPE/android-build/$FINAL_NAME
+
+          printenv >> $GITHUB_ENV
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android_arm64-artifact
+          path: "./build/${{ env.OS }}/${{ env.ABI }}/${{ env.BUILD_TYPE }}/android-build/${{ env.FINAL_NAME }}"
+
+
+  build_android_x86_64:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26c
+          add-to-path: true
+          local-cache: true
+      - name: Install Host Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '6.6.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action'
+          modules: 'qtmultimedia'
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '6.6.2'
+          host: 'linux'
+          target: 'android'
+          arch: 'android_x86_64'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action'
+          modules: 'qtmultimedia'
+      - name: Install Conan
+        id: conan
+        uses: turtlebrowser/get-conan@main
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+          ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          ANDROID_KEYALIAS: ${{ secrets.ANDROID_KEYALIAS }}
+          ANDROID_KEYALIAS_PASS: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+        run: |
+          env && echo "-----------------------------"
+
+          set +x
+          echo "$ANDROID_KEYSTORE" | base64 --decode > /tmp/android_release.keystore
+          export ANDROID_KEYSTORE_FILE=/tmp/android_release.keystore
+          export ANDROID_KEYSTORE_PASS="$ANDROID_KEYSTORE_PASS"
+          export ANDROID_KEYALIAS="$ANDROID_KEYALIAS"
+          export ANDROID_KEYALIAS_PASS="$ANDROID_KEYALIAS_PASS"
+          set -x
+
+          export OS=Android
+          export ABI=x86_64
+          export BUILD_TYPE=Release
+          export STAGE=All
+          export API_LEVEL=33
+          sudo apt-get update && sudo apt-get install -y apksigner
+          ./build_number.sh # hack for Google Play to get different VERSION_CODE
+          ./build.sh
+          source config.h.sh
+          export ANDROID_KEYSTORE=""
+          export ANDROID_KEYSTORE_PASS=""
+          export ANDROID_KEYALIAS=""
+          export ANDROID_KEYALIAS_PASS=""
+
+          export FINAL_NAME=${PROJECT_NAME}_${PROJECT_VERSION}_${OS}_${ABI}.apk
+          mv ./build/$OS/$ABI/$BUILD_TYPE/android-build/$PROJECT_NAME.apk \
+             ./build/$OS/$ABI/$BUILD_TYPE/android-build/$FINAL_NAME
+
+          printenv >> $GITHUB_ENV
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android_x86_64-artifact
+          path: "./build/${{ env.OS }}/${{ env.ABI }}/${{ env.BUILD_TYPE }}/android-build/${{ env.FINAL_NAME }}"
+
+
+  build_windows_x86_64:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '6.6.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action'
+          modules: 'qtmultimedia'
+      - name: Install Conan
+        id: conan
+        uses: turtlebrowser/get-conan@main
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        run: |
+          env && echo "-----------------------------"
+          export OS=Windows
+          export ABI=x86_64
+          export BUILD_TYPE=Release
+          export STAGE=All
+          ./build.sh
+          source config.h.sh
+
+          export FINAL_NAME=${PROJECT_NAME}_${PROJECT_VERSION}_${OS}_${ABI}.tar.bz2
+          mv ./build/$OS/$ABI/$BUILD_TYPE/$PROJECT_NAME.tar.bz2 \
+             ./build/$OS/$ABI/$BUILD_TYPE/$FINAL_NAME
+
+          printenv >> $GITHUB_ENV
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_x86_64-artifact
+          path: "./build/${{ env.OS }}/${{ env.ABI }}/${{ env.BUILD_TYPE }}/${{ env.FINAL_NAME }}"
+
+
+  build_linux_x86_64:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '6.6.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action'
+          modules: 'qtmultimedia'
+      - name: Install Conan
+        id: conan
+        uses: turtlebrowser/get-conan@main
+      - name: Install LinuxDeploy
+        uses: miurahr/install-linuxdeploy-action@v1
+        with:
+          plugins: qt appimage
+      - name: install dependencies
+        run: sudo apt-get update && sudo apt-get install libfuse2 libxcb-cursor0 -y
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        run: |
+          env && echo "-----------------------------"
+          export OS=Linux
+          export ABI=x86_64
+          export BUILD_TYPE=Release
+          export STAGE=All
+          ./build.sh
+          source config.h.sh
+
+          export FINAL_NAME=${PROJECT_NAME}_${PROJECT_VERSION}_${OS}_${ABI}.AppImage
+          mv ./build/$OS/$ABI/$BUILD_TYPE/$PROJECT_NAME-$ABI.AppImage \
+             ./build/$OS/$ABI/$BUILD_TYPE/$FINAL_NAME
+
+          printenv >> $GITHUB_ENV
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux_x86_64-artifact
+          path: "./build/${{ env.OS }}/${{ env.ABI }}/${{ env.BUILD_TYPE }}/${{ env.FINAL_NAME }}"
+
+
+  collect_artifacts:
+    needs: [build_android_arm64, build_android_x86_64, build_windows_x86_64, build_linux_x86_64]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts android_arm64
+        uses: actions/download-artifact@v4
+        with:
+          name: android_arm64-artifact
+          path: ./artifact
+      - name: Download artifacts android_x86_64
+        uses: actions/download-artifact@v4
+        with:
+          name: android_x86_64-artifact
+          path: ./artifact
+      - name: Download artifacts windows
+        uses: actions/download-artifact@v4
+        with:
+          name: windows_x86_64-artifact
+          path: ./artifact
+      - name: Download artifacts linux
+        uses: actions/download-artifact@v4
+        with:
+          name: linux_x86_64-artifact
+          path: ./artifact
+      - name: Prepare
+        shell: bash
+        run: |
+          ls -R
+      - name: Release
+        uses: ncipollo/release-action@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          artifacts: "./artifact/*"
+          tag: ${{ github.ref_name }}
