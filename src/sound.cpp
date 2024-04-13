@@ -33,22 +33,22 @@ Sound::~Sound() {
     // delete bgMusicPL;
 }
 
-Sound &Sound::getInstance() {
+Sound &Sound::instance() {
     static Sound instance;
     return instance;
 }
 
 void Sound::click() {
     if (Settings::getSoundState()) {
-        Sound::getInstance().clickSound->stop();
-        Sound::getInstance().clickSound->play();
+        instance().clickSound->stop();
+        instance().clickSound->play();
     }
 }
 
 void Sound::switching() {
     if (Settings::getSoundState()) {
-        Sound::getInstance().switchingSound->stop();
-        Sound::getInstance().switchingSound->play();
+        instance().switchingSound->stop();
+        instance().switchingSound->play();
     }
 }
 

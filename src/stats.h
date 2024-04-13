@@ -19,7 +19,7 @@ class Stats {
     Stats &operator=(const Stats &) = delete;
 
   public:
-    static Stats &getInstance();
+    static Stats &instance();
 
     static std::pair<int, int>
     getRandomIndexes(int table_side_from, int table_side_to, bool intelMode);

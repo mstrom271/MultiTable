@@ -53,7 +53,7 @@ Settings::Settings() {
 #endif
 }
 
-Settings &Settings::getInstance() {
+Settings &Settings::instance() {
     static Settings instance;
     return instance;
 }
@@ -105,66 +105,60 @@ void Settings::upgradeOldSettings() {
     }
 }
 
-bool Settings::getFirstRun() { return Settings::getInstance().FirstRun; }
+bool Settings::getFirstRun() { return instance().FirstRun; }
 
-QString Settings::getLanguage() { return Settings::getInstance().Language; }
+QString Settings::getLanguage() { return instance().Language; }
 void Settings::setLanguage(QString newLanguage) {
-    Settings::getInstance().settings.setValue("/Language", newLanguage);
-    Settings::getInstance().Language = newLanguage;
+    instance().settings.setValue("/Language", newLanguage);
+    instance().Language = newLanguage;
 };
 
-QString Settings::getTheme() { return Settings::getInstance().Theme; }
+QString Settings::getTheme() { return instance().Theme; }
 void Settings::setTheme(QString newTheme) {
-    Settings::getInstance().settings.setValue("/Theme", newTheme);
-    Settings::getInstance().Theme = newTheme;
+    instance().settings.setValue("/Theme", newTheme);
+    instance().Theme = newTheme;
 };
 
-QString Settings::getStats() { return Settings::getInstance().Stats; }
+QString Settings::getStats() { return instance().Stats; }
 void Settings::setStats(QString newStats) {
-    Settings::getInstance().settings.setValue("/Stats", newStats);
-    Settings::getInstance().Stats = newStats;
+    instance().settings.setValue("/Stats", newStats);
+    instance().Stats = newStats;
 };
 
-bool Settings::getSoundState() { return Settings::getInstance().SoundState; }
+bool Settings::getSoundState() { return instance().SoundState; }
 void Settings::setSoundState(bool newSoundState) {
-    Settings::getInstance().settings.setValue("/SoundState", newSoundState);
-    Settings::getInstance().SoundState = newSoundState;
+    instance().settings.setValue("/SoundState", newSoundState);
+    instance().SoundState = newSoundState;
 };
 
-bool Settings::getMusicState() { return Settings::getInstance().MusicState; }
+bool Settings::getMusicState() { return instance().MusicState; }
 void Settings::setMusicState(bool newMusicState) {
-    Settings::getInstance().settings.setValue("/MusicState", newMusicState);
-    Settings::getInstance().MusicState = newMusicState;
+    instance().settings.setValue("/MusicState", newMusicState);
+    instance().MusicState = newMusicState;
 };
 
-bool Settings::getIntelMode() { return Settings::getInstance().IntelMode; }
+bool Settings::getIntelMode() { return instance().IntelMode; }
 void Settings::setIntelMode(bool newIntelMode) {
-    Settings::getInstance().settings.setValue("/IntelMode", newIntelMode);
-    Settings::getInstance().IntelMode = newIntelMode;
+    instance().settings.setValue("/IntelMode", newIntelMode);
+    instance().IntelMode = newIntelMode;
 };
 
-int Settings::getTableSide_From() {
-    return Settings::getInstance().TableSide_From;
-}
+int Settings::getTableSide_From() { return instance().TableSide_From; }
 void Settings::setTableSide_From(int newTableSide_From) {
-    Settings::getInstance().settings.setValue("/TableSide_From",
-                                              newTableSide_From);
-    Settings::getInstance().TableSide_From = newTableSide_From;
+    instance().settings.setValue("/TableSide_From", newTableSide_From);
+    instance().TableSide_From = newTableSide_From;
 };
 
-int Settings::getTableSide_To() { return Settings::getInstance().TableSide_To; }
+int Settings::getTableSide_To() { return instance().TableSide_To; }
 void Settings::setTableSide_To(int newTableSide_To) {
-    Settings::getInstance().settings.setValue("/TableSide_To", newTableSide_To);
-    Settings::getInstance().TableSide_To = newTableSide_To;
+    instance().settings.setValue("/TableSide_To", newTableSide_To);
+    instance().TableSide_To = newTableSide_To;
 };
 
-int Settings::getExerciseTimer() {
-    return Settings::getInstance().ExerciseTimer;
-}
+int Settings::getExerciseTimer() { return instance().ExerciseTimer; }
 void Settings::setExerciseTimer(int newExerciseTimer) {
-    Settings::getInstance().settings.setValue("/ExerciseTimer",
-                                              newExerciseTimer);
-    Settings::getInstance().ExerciseTimer = newExerciseTimer;
+    instance().settings.setValue("/ExerciseTimer", newExerciseTimer);
+    instance().ExerciseTimer = newExerciseTimer;
 };
 
 // Temporary settings
@@ -185,23 +179,15 @@ QSize Settings::getWindowSize() {
         return QSize(600, 800);
 }
 
-QFont Settings::getFont1() { return Settings::getInstance().Font1; }
-void Settings::setFont1(QFont newFont1) {
-    Settings::getInstance().Font1 = newFont1;
-};
-QFont Settings::getFont2() { return Settings::getInstance().Font2; }
-void Settings::setFont2(QFont newFont2) {
-    Settings::getInstance().Font2 = newFont2;
-};
-QFont Settings::getFont3() { return Settings::getInstance().Font3; }
-void Settings::setFont3(QFont newFont3) {
-    Settings::getInstance().Font3 = newFont3;
-};
-QFont Settings::getFont4() { return Settings::getInstance().Font4; }
-void Settings::setFont4(QFont newFont4) {
-    Settings::getInstance().Font4 = newFont4;
-};
-double Settings::getLogicalDPI() { return Settings::getInstance().LogicalDPI; }
+QFont Settings::getFont1() { return instance().Font1; }
+void Settings::setFont1(QFont newFont1) { instance().Font1 = newFont1; };
+QFont Settings::getFont2() { return instance().Font2; }
+void Settings::setFont2(QFont newFont2) { instance().Font2 = newFont2; };
+QFont Settings::getFont3() { return instance().Font3; }
+void Settings::setFont3(QFont newFont3) { instance().Font3 = newFont3; };
+QFont Settings::getFont4() { return instance().Font4; }
+void Settings::setFont4(QFont newFont4) { instance().Font4 = newFont4; };
+double Settings::getLogicalDPI() { return instance().LogicalDPI; }
 void Settings::setLogicalDPI(double newLogicalDPI) {
-    Settings::getInstance().LogicalDPI = newLogicalDPI;
+    instance().LogicalDPI = newLogicalDPI;
 };

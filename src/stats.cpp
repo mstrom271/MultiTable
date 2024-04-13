@@ -9,7 +9,7 @@ Stats::Stats() : table(tableSize()) {
     load();
 }
 
-Stats &Stats::getInstance() {
+Stats &Stats::instance() {
     static Stats instance;
     return instance;
 }
@@ -17,14 +17,14 @@ Stats &Stats::getInstance() {
 std::pair<int, int> Stats::getRandomIndexes(int table_side_from,
                                             int table_side_to, bool intelMode) {
     QVector<int> shrinkedTable =
-        Stats::getShrinkedTable(table_side_from, table_side_to, intelMode);
+        getShrinkedTable(table_side_from, table_side_to, intelMode);
     std::discrete_distribution dist(std::begin(shrinkedTable),
                                     std::end(shrinkedTable));
-    int index = dist(Stats::getInstance().generator);
-    std::pair<int, int> result = Stats::fromIndex(index);
+    int index = dist(instance().generator);
+    std::pair<int, int> result = fromIndex(index);
 
     std::uniform_int_distribution<int> ud(0, 1);
-    if (ud(Stats::getInstance().generator))
+    if (ud(instance().generator))
         std::swap(result.first, result.second);
     return result;
 }
@@ -34,7 +34,7 @@ bool Stats::updateProbability(int problemI, int problemJ, int decisecs,
     bool progress = false;
 
     if (intelMode) {
-        int value = Stats::getValue(problemI, problemJ);
+        int value = getValue(problemI, problemJ);
 
         if (promptShowed)
             decisecs = 149;
@@ -48,8 +48,8 @@ bool Stats::updateProbability(int problemI, int problemJ, int decisecs,
         }
 
         value = std::clamp(value, 1, 149);
-        Stats::setValue(problemI, problemJ, value);
-        Stats::store();
+        setValue(problemI, problemJ, value);
+        store();
     }
 
     return progress;
@@ -89,7 +89,7 @@ void Stats::load() {
         auto it = std::begin(table_vec);
         for (int j = 2; j <= table_side; j++) {
             for (int i = j; i <= table_side; i++) {
-                Stats::setValue(i, j, *it++);
+                setValue(i, j, *it++);
             }
         }
     } else {
@@ -110,20 +110,19 @@ void Stats::print() {
     qDebug() << "----------------------------";
     for (int j = 2; j <= table_side; j++) {
         for (int i = 2; i <= table_side; i++) {
-            std::cout << Stats::getValue(i, j) << "\t";
+            std::cout << getValue(i, j) << "\t";
         }
         std::cout << std::endl;
     }
     qDebug() << "----------------------------";
-    for (int i = 0; i < Stats::tableSize(); i++) {
-        std::cout << i << ":" << Stats::getInstance().table[i] << ", ";
+    for (int i = 0; i < tableSize(); i++) {
+        std::cout << i << ":" << instance().table[i] << ", ";
     }
     std::cout << std::endl;
 }
 
 void Stats::fill() {
-    std::fill(std::begin(Stats::getInstance().table),
-              std::end(Stats::getInstance().table), 60);
+    std::fill(std::begin(instance().table), std::end(instance().table), 60);
     //    for (int i=0; i<table.size(); i++)
     //        table[i] = static_cast<double>(i)/table.size()*80+40;
 }
@@ -138,7 +137,7 @@ int Stats::toIndex(int i, int j) {
         std::swap(i, j); // we work with bottom-left part of the table only. The
                          // top-right part is a mirror of bottom-left
 
-    return Stats::tableSize(j) - (j - i + 1);
+    return tableSize(j) - (j - i + 1);
 }
 
 std::pair<int, int> Stats::fromIndex(int index) {
@@ -159,24 +158,22 @@ std::pair<int, int> Stats::fromIndex(int index) {
     return result;
 }
 
-int Stats::getValue(int i, int j) {
-    return Stats::getInstance().table[toIndex(i, j)];
-}
+int Stats::getValue(int i, int j) { return instance().table[toIndex(i, j)]; }
 
 void Stats::setValue(int i, int j, int value) {
-    Stats::getInstance().table[toIndex(i, j)] = value;
+    instance().table[toIndex(i, j)] = value;
 }
 
 QVector<int> Stats::getShrinkedTable(int table_side_from, int table_side_to,
                                      bool intelMode) {
-    QVector<int> temp = Stats::getInstance().table;
+    QVector<int> temp = instance().table;
     for (int j = 2; j <= table_side; j++)
         for (int i = j; i <= table_side; i++)
             if ((i < table_side_from && j < table_side_from) ||
                 (i > table_side_to || j > table_side_to)) {
-                temp[Stats::toIndex(i, j)] = 0;
+                temp[toIndex(i, j)] = 0;
             } else if (intelMode == false)
-                temp[Stats::toIndex(i, j)] = 1;
+                temp[toIndex(i, j)] = 1;
 
     return temp;
 }

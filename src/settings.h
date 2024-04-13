@@ -28,7 +28,7 @@ class Settings {
     void upgradeOldSettings();
 
   public:
-    static Settings &getInstance();
+    static Settings &instance();
 
     static bool getFirstRun();
 

@@ -14,7 +14,7 @@ class Sound {
 
   public:
     ~Sound();
-    static Sound &getInstance();
+    static Sound &instance();
 
     static void click();
     static void switching();
