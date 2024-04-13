@@ -101,10 +101,6 @@ void SetupWidget::onThemeChange() {
         QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/help_icon.png"));
     likeBtn->setIcon(
         QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/like_icon.png"));
-#ifdef FREE_VERSION
-    proBtn->setIcon(
-        QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/pro_icon.png"));
-#endif
 }
 
 void SetupWidget::onLanguageChange() {
@@ -131,11 +127,7 @@ bool SetupWidget::event(QEvent *event) {
 void SetupWidget::resizeEvent(QResizeEvent *event) {
     // Min and Max sizes of widgets
     for (auto wgt : std::initializer_list<QWidget *>{
-             deleteStatsBtn, settingsBtn, helpBtn, likeBtn,
-#ifdef FREE_VERSION
-             proBtn,
-#endif
-             startBtn}) {
+             deleteStatsBtn, settingsBtn, helpBtn, likeBtn, startBtn}) {
         wgt->setMinimumHeight(Settings::getLogicalDPI() * 0.15);
         wgt->setMaximumHeight(Settings::getLogicalDPI() * 0.25);
     }
@@ -157,9 +149,6 @@ void SetupWidget::paintEvent(QPaintEvent *event) {
              settingsBtn,
              helpBtn,
              likeBtn,
-#ifdef FREE_VERSION
-             proBtn,
-#endif
          }) {
         btn->setIconSize(QSize(btn->size().height() * iconScale,
                                btn->size().height() * iconScale));

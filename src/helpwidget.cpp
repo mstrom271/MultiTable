@@ -12,14 +12,6 @@ void HelpWidget::onThemeChange() {}
 
 void HelpWidget::onLanguageChange() {
     QString helpmsg;
-#ifdef FREE_VERSION
-    helpmsg += "<p>&nbsp;</p>\
-                    <p style=\"text-align: center;\">\
-                    <a href=\"https://play.google.com/store/apps/details?id=org.tapmyapp.multitable_pro\">" +
-               QApplication::applicationName() + " Pro - " + tr("No Ads!") +
-               "</a></p>\
-                    <p>&nbsp;</p>";
-#endif
 
     QFile file(":/rcc/help_" + tr("en") + ".html");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))

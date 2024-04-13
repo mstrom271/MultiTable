@@ -34,9 +34,6 @@ class SetupWidget : public QWidget {
     QVBoxLayout *vLayout;
     QHBoxLayout *hLayout1;
     QPushButton *deleteStatsBtn, *settingsBtn, *helpBtn, *likeBtn;
-#ifdef FREE_VERSION
-    QPushButton *proBtn;
-#endif
     QHBoxLayout *hLayout2;
     QLabel *lblGreen, *lblTextGreen, *lblRed, *lblTextRed;
     StatsWidget *tableWgt;
