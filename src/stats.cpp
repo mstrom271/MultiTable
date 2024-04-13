@@ -122,7 +122,7 @@ void Stats::print() {
 }
 
 void Stats::fill() {
-    std::fill(std::begin(instance().table), std::end(instance().table), 60);
+    std::fill(std::begin(table), std::end(table), 60);
     //    for (int i=0; i<table.size(); i++)
     //        table[i] = static_cast<double>(i)/table.size()*80+40;
 }

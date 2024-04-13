@@ -79,7 +79,7 @@ void SetupWidget::deleteStats() {
     MessageBox *dlg = new MessageBox();
     dlg->setText(msgDeleteAll);
     if (dlg->exec() == QDialog::DialogCode::Accepted) {
-        Stats::fill();
+        Stats::instance().fill();
         Stats::store();
         tableWgt->update();
     }
@@ -94,16 +94,16 @@ void SetupWidget::likeApp() {
 
 void SetupWidget::onThemeChange() {
     deleteStatsBtn->setIcon(
-        QIcon(":/res/" + Theme::getEffectiveTheme() + "/delete_all_icon.png"));
+        QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/delete_all_icon.png"));
     settingsBtn->setIcon(
-        QIcon(":/res/" + Theme::getEffectiveTheme() + "/settings_icon.png"));
+        QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/settings_icon.png"));
     helpBtn->setIcon(
-        QIcon(":/res/" + Theme::getEffectiveTheme() + "/help_icon.png"));
+        QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/help_icon.png"));
     likeBtn->setIcon(
-        QIcon(":/res/" + Theme::getEffectiveTheme() + "/like_icon.png"));
+        QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/like_icon.png"));
 #ifdef FREE_VERSION
     proBtn->setIcon(
-        QIcon(":/res/" + Theme::getEffectiveTheme() + "/pro_icon.png"));
+        QIcon(":/rcc/" + Theme::getEffectiveTheme() + "/pro_icon.png"));
 #endif
 }
 

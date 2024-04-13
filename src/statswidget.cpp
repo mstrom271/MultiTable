@@ -13,7 +13,7 @@ StatsWidget::StatsWidget(QWidget *wgt) : QWidget(wgt) {
 }
 
 void StatsWidget::onThemeChange() {
-    handlePixmap.load(":/res/" + Theme::getEffectiveTheme() +
+    handlePixmap.load(":/rcc/" + Theme::getEffectiveTheme() +
                       "/resize_icon.png");
 }
 

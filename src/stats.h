@@ -32,8 +32,8 @@ class Stats {
     static void setValue(int i, int j, int value);
     static QVector<int> getShrinkedTable(int table_side_from, int table_side_to,
                                          bool intelMode);
-    static void load();
+    void load();
     static void store();
     static void print();
-    static void fill();
+    void fill();
 };

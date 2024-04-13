@@ -7,18 +7,18 @@ Sound::Sound() {
     clickSound = new QSoundEffect;
     switchingSound = new QSoundEffect;
 
-    clickSound->setSource(QUrl("qrc:/res/Sounds/clickSound.wav"));
-    // switchingSound->setMedia(QUrl("qrc:/res/Sounds/switchingSound.mp3"));
-    switchingSound->setSource(QUrl("qrc:/res/Sounds/clickSound.wav"));
+    clickSound->setSource(QUrl("qrc:/rcc/Sounds/clickSound.wav"));
+    // switchingSound->setMedia(QUrl("qrc:/rcc/Sounds/switchingSound.mp3"));
+    switchingSound->setSource(QUrl("qrc:/rcc/Sounds/clickSound.wav"));
 
     // QMediaPlaylist *playlist = new QMediaPlaylist;
-    // playlist->addMedia(QUrl("qrc:/res/Sounds/bg_music1.mp3"));
-    // playlist->addMedia(QUrl("qrc:/res/Sounds/bg_music2.mp3"));
-    // playlist->addMedia(QUrl("qrc:/res/Sounds/bg_music3.mp3"));
-    // playlist->addMedia(QUrl("qrc:/res/Sounds/bg_music4.mp3"));
-    // playlist->addMedia(QUrl("qrc:/res/Sounds/bg_music5.mp3"));
-    // playlist->addMedia(QUrl("qrc:/res/Sounds/bg_music6.mp3"));
-    // playlist->addMedia(QUrl("qrc:/res/Sounds/bg_music7.mp3"));
+    // playlist->addMedia(QUrl("qrc:/rcc/Sounds/bg_music1.mp3"));
+    // playlist->addMedia(QUrl("qrc:/rcc/Sounds/bg_music2.mp3"));
+    // playlist->addMedia(QUrl("qrc:/rcc/Sounds/bg_music3.mp3"));
+    // playlist->addMedia(QUrl("qrc:/rcc/Sounds/bg_music4.mp3"));
+    // playlist->addMedia(QUrl("qrc:/rcc/Sounds/bg_music5.mp3"));
+    // playlist->addMedia(QUrl("qrc:/rcc/Sounds/bg_music6.mp3"));
+    // playlist->addMedia(QUrl("qrc:/rcc/Sounds/bg_music7.mp3"));
 
     // bgMusicPL = new QMediaPlayer;
     // bgMusicPL->setVolume(20);
