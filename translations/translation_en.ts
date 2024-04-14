@@ -32,17 +32,16 @@
 <context>
     <name>HelpWidget</name>
     <message>
-        <location filename="../src/helpwidget.cpp" line="19"/>
         <source>No Ads!</source>
-        <translation>No Ads!</translation>
+        <translation type="vanished">No Ads!</translation>
     </message>
     <message>
-        <location filename="../src/helpwidget.cpp" line="24"/>
+        <location filename="../src/helpwidget.cpp" line="16"/>
         <source>en</source>
         <translation>en</translation>
     </message>
     <message>
-        <location filename="../src/helpwidget.cpp" line="30"/>
+        <location filename="../src/helpwidget.cpp" line="22"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
@@ -50,12 +49,12 @@
 <context>
     <name>MessageBox</name>
     <message>
-        <location filename="../src/setupwidget.cpp" line="209"/>
+        <location filename="../src/setupwidget.cpp" line="198"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="210"/>
+        <location filename="../src/setupwidget.cpp" line="199"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
@@ -136,22 +135,22 @@
 <context>
     <name>SetupWidget</name>
     <message>
-        <location filename="../src/setupwidget.cpp" line="111"/>
+        <location filename="../src/setupwidget.cpp" line="107"/>
         <source>Start</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="113"/>
+        <location filename="../src/setupwidget.cpp" line="109"/>
         <source>Well learned pairs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="114"/>
+        <location filename="../src/setupwidget.cpp" line="110"/>
         <source>Poorly learned pairs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="116"/>
+        <location filename="../src/setupwidget.cpp" line="112"/>
         <source>Delete all statistics?</source>
         <translation></translation>
     </message>

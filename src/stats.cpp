@@ -1,4 +1,5 @@
 #include "stats.h"
+#include "serialize.h"
 #include "settings.h"
 #include <QtCore>
 #include <iostream>
@@ -55,56 +56,15 @@ bool Stats::updateProbability(int problemI, int problemJ, int decisecs,
     return progress;
 }
 
-QVector<int> parse_str(QString s) {
-    QVector<int> tokens;
-    std::stringstream check(s.toStdString());
-    std::string intermediate;
-    while (getline(check, intermediate, ':')) {
-        int result;
-        try {
-            result = std::stoi(intermediate);
-        } catch (...) {
-            result = 0;
-        }
-        tokens.push_back(result);
-    }
-    return tokens;
-}
-
 void Stats::load() {
-    QVector<int> table_vec;
-    std::stringstream check(Settings::getStats().toStdString());
-    std::string intermediate;
-    while (getline(check, intermediate, ':')) {
-        int result;
-        try {
-            result = std::stoi(intermediate);
-        } catch (...) {
-            result = 0;
-        }
-        table_vec.push_back(result);
-    }
-
-    if (table_vec.size() == tableSize()) {
-        auto it = std::begin(table_vec);
-        for (int j = 2; j <= table_side; j++) {
-            for (int i = j; i <= table_side; i++) {
-                setValue(i, j, *it++);
-            }
-        }
-    } else {
+    table = deSerializeVector(Settings::getStats());
+    if (table.size() != tableSize()) {
         qDebug() << "can't load stats";
         fill();
     }
 }
 
-void Stats::store() {
-    QString s;
-    for (int j = 2; j <= table_side; j++)
-        for (int i = j; i <= table_side; i++)
-            s += QString::number(getValue(i, j)) + ":";
-    Settings::setStats(s);
-}
+void Stats::store() { Settings::setStats(serializeVector(instance().table)); }
 
 void Stats::print() {
     qDebug() << "----------------------------";
