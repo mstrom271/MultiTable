@@ -7,6 +7,6 @@
 #define PROJECT_VERSION_MAJOR "0"
 #define PROJECT_VERSION_MINOR "3"
 #define ORGANIZATION_NAME "TapMyApp"
-#define BUILD_NUMBER 128
+#define BUILD_NUMBER 131
 #define ANDROID_PROJECT_NAME "org.tapmyapp.multitable_free"
 // clang-format on

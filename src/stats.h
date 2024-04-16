@@ -4,36 +4,42 @@
 #include <random>
 
 class Stats {
-  public:
-    static constexpr int table_side = 12;
-    static constexpr int tableSize(int tableSide = table_side) {
-        return (((tableSide - 1) * (tableSide - 1)) + (tableSide - 1)) / 2;
-    }
+    // only top-right part of the table is used
+    // The other part is mirroring values
+    // 2x2 3x2 4x2 5x2
+    // 	   3x3 4x3 5x3
+    // 	       4x4 5x4
+    //             5x5
+    static constexpr int tableMin = 2;
+    static constexpr int tableMax = 12;
+    static constexpr int tableSize = tableMax + 1 - tableMin;
 
-  private:
-    QVector<int> table;
+    QVector<int> tableProb; // table of probability
     std::default_random_engine generator;
 
     Stats();
     Stats(const Stats &) = delete;
     Stats &operator=(const Stats &) = delete;
 
+    void load();
+    void store();
+    int &operator()(int x, int y);
+
   public:
     static Stats &instance();
 
-    static std::pair<int, int>
-    getRandomIndexes(int table_side_from, int table_side_to, bool intelMode);
-    static bool updateProbability(int problemI, int problemJ, int decisec,
-                                  bool promptShowed, bool intelMode);
-
-    static int toIndex(int i, int j);
-    static std::pair<int, int> fromIndex(int index);
-    static int getValue(int i, int j);
-    static void setValue(int i, int j, int value);
-    static QVector<int> getShrinkedTable(int table_side_from, int table_side_to,
+    static std::pair<int, int> getRandom(int subTableMin, int subTableMax,
                                          bool intelMode);
-    void load();
-    static void store();
+    static bool updateProbability(int x, int y, int timeAnswer,
+                                  bool hintShowed);
+
+    static int min();
+    static int max();
+    static int side();
+    static int toIndex(int x, int y);
+    static std::pair<int, int> fromIndex(int index);
+    static int getValue(int x, int y);
+    static void setValue(int x, int y, int value);
     static void print();
-    void fill();
+    static void deleteStats();
 };

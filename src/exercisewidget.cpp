@@ -13,9 +13,9 @@ using namespace std::chrono;
 typedef duration<long long, std::ratio<1, 10>> deciseconds;
 
 void ExerciseWidget::generateProblem() {
-    problemIndexes = Stats::getRandomIndexes(Settings::getTableSide_From(),
-                                             Settings::getTableSide_To(),
-                                             Settings::getIntelMode());
+    problemIndexes =
+        Stats::getRandom(Settings::getTableSide_From(),
+                         Settings::getTableSide_To(), Settings::getIntelMode());
 
     result.clear();
     showProblem();
@@ -228,7 +228,7 @@ void ExerciseWidget::clicked_number() {
 
             Stats::updateProbability(problemIndexes.first,
                                      problemIndexes.second, decisecs,
-                                     promptShowed, Settings::getIntelMode());
+                                     promptShowed);
 
             answerLabel->setText("<p>" + answersText + ":</p><p>" +
                                  QString::number(++answers) + "</p>");

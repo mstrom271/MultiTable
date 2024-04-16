@@ -61,8 +61,9 @@ Settings &Settings::instance() {
 void Settings::upgradeOldSettings() {
     // evaluate from 0.1 to 0.2
     if (settings.contains("/firsthelp") && !settings.contains("/version")) {
-        // remove /firsthelp
+        // remove obsolete keys
         settings.remove("/firsthelp");
+        settings.remove("/stats");
 
         // create /firstrun
         settings.setValue("/firstrun", false);
@@ -82,7 +83,7 @@ void Settings::upgradeOldSettings() {
             {"/language",           "/Language"},
             {"/clickSound",         "/SoundState"},
             {"/music",              "/MusicState"},
-            {"/stats",              "/Stats"},
+            // {"/stats",              "/Stats"},
             {"/tableSide_from",     "/TableSide_From"},
             {"/tableSide_to",       "/TableSide_To"},
             {"/theme",              "/Theme"},

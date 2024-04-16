@@ -1,8 +1,9 @@
 #include "serialize.h"
+#include <QStringList>
 
-QString serializeVector(QVector<int> Vector) {
+QString serializeVector(QVector<int> vec) {
     QString s;
-    for (auto &i : Vector)
+    for (auto &i : vec)
         s += QString::number(i) + ":";
     return s;
 }

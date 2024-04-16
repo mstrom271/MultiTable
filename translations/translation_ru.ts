@@ -49,12 +49,12 @@
 <context>
     <name>MessageBox</name>
     <message>
-        <location filename="../src/setupwidget.cpp" line="198"/>
+        <location filename="../src/setupwidget.cpp" line="197"/>
         <source>Ok</source>
         <translation>Хорошо</translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="199"/>
+        <location filename="../src/setupwidget.cpp" line="198"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -142,22 +142,22 @@
 <context>
     <name>SetupWidget</name>
     <message>
-        <location filename="../src/setupwidget.cpp" line="107"/>
+        <location filename="../src/setupwidget.cpp" line="106"/>
         <source>Start</source>
         <translation>Старт</translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="109"/>
+        <location filename="../src/setupwidget.cpp" line="108"/>
         <source>Well learned pairs</source>
         <translation>Хорошо изученные пары</translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="110"/>
+        <location filename="../src/setupwidget.cpp" line="109"/>
         <source>Poorly learned pairs</source>
         <translation>Плохо изученные пары</translation>
     </message>
     <message>
-        <location filename="../src/setupwidget.cpp" line="112"/>
+        <location filename="../src/setupwidget.cpp" line="111"/>
         <source>Delete all statistics?</source>
         <translation>Удалить всю статистику?</translation>
     </message>

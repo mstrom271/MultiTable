@@ -79,8 +79,7 @@ void SetupWidget::deleteStats() {
     MessageBox *dlg = new MessageBox();
     dlg->setText(msgDeleteAll);
     if (dlg->exec() == QDialog::DialogCode::Accepted) {
-        Stats::instance().fill();
-        Stats::store();
+        Stats::deleteStats();
         tableWgt->update();
     }
     Sound::switching();

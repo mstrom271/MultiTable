@@ -40,7 +40,7 @@ void StatsWidget::paintEvent(QPaintEvent *event) {
     painter.setFont(font_header);
     QFontMetrics fm_header(font_header);
 
-    for (int i = 2; i <= Stats::table_side; i++) {
+    for (int i = 2; i <= Stats::max(); i++) {
         QString text = QString::number(i);
         QPointF pointH((i - 1) * cellSide + cellSide / 2 -
                            fm_header.horizontalAdvance(text) / 2.0,
@@ -60,9 +60,9 @@ void StatsWidget::paintEvent(QPaintEvent *event) {
     painter.setFont(font_regular);
     QFontMetrics fm_regular(font_regular);
 
-    for (int i = 2; i <= Stats::table_side; i++) {
-        for (int j = 2; j <= Stats::table_side; j++) {
-            double color_inc = (Stats::getValue(i, j)) / 150.0;
+    for (int i = 2; i <= Stats::max(); i++) {
+        for (int j = 2; j <= Stats::max(); j++) {
+            double color_inc = (Stats::getValue(i, j)) / 998.0;
             QColor color;
             if (color_inc < 0.5) {
                 color = QColor(0, 255, 0,
@@ -141,7 +141,7 @@ void StatsWidget::resizeEvent(QResizeEvent *event) {
 
     side = std::min(width() - 10, height() - 10);
     corner = QPointF(((width() - 10) - side) / 2.0 + 5, 5);
-    cellSide = side / Stats::table_side;
+    cellSide = side / Stats::max();
 
     handle1 =
         QPointF(cellSide * (Settings::getTableSide_From() - 1) + corner.x(),

@@ -2,12 +2,39 @@
 #include "serialize.h"
 #include "settings.h"
 #include <QtCore>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 
-Stats::Stats() : table(tableSize()) {
-    generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+void Stats::load() {
+    tableProb.resize(tableSize * tableSize);
+    tableProb.fill(0);
+
+    QVector<int> reducedTable = deSerializeVector(Settings::getStats());
+    constexpr int reducedTableSize = tableSize * (tableSize + 1) / 2;
+    if (reducedTable.size() != reducedTableSize) {
+        reducedTable.resize(reducedTableSize);
+        constexpr int lowerLevel = 1;
+        reducedTable.fill(lowerLevel);
+    }
+
+    int it = 0;
+    for (int y = tableMin; y <= tableMax; y++)
+        for (int x = y; x <= tableMax; x++)
+            operator()(x, y) = reducedTable[it++];
+}
+
+void Stats::store() {
+    QVector<int> reducedTable;
+    for (int y = tableMin; y <= tableMax; y++)
+        for (int x = y; x <= tableMax; x++)
+            reducedTable.push_back(operator()(x, y));
+    Settings::setStats(serializeVector(reducedTable));
+}
+
+Stats::Stats() {
     load();
+    generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
 }
 
 Stats &Stats::instance() {
@@ -15,125 +42,135 @@ Stats &Stats::instance() {
     return instance;
 }
 
-std::pair<int, int> Stats::getRandomIndexes(int table_side_from,
-                                            int table_side_to, bool intelMode) {
-    QVector<int> shrinkedTable =
-        getShrinkedTable(table_side_from, table_side_to, intelMode);
-    std::discrete_distribution dist(std::begin(shrinkedTable),
-                                    std::end(shrinkedTable));
-    int index = dist(instance().generator);
-    std::pair<int, int> result = fromIndex(index);
-
-    std::uniform_int_distribution<int> ud(0, 1);
-    if (ud(instance().generator))
-        std::swap(result.first, result.second);
-    return result;
+int &Stats::operator()(int x, int y) {
+    if (x < y)
+        std::swap(x, y);
+    return tableProb[toIndex(x, y)];
 }
 
-bool Stats::updateProbability(int problemI, int problemJ, int decisecs,
-                              bool promptShowed, bool intelMode) {
-    bool progress = false;
+int Stats::min() { return instance().tableMin; }
 
-    if (intelMode) {
-        int value = getValue(problemI, problemJ);
+int Stats::max() { return instance().tableMax; }
 
-        if (promptShowed)
-            decisecs = 149;
+int Stats::side() { return instance().tableMax - instance().tableMin; }
 
-        if (decisecs > value) {
-            value += std::min(decisecs - value, 25);
-            progress = false;
-        } else {
-            value -= std::min(value - decisecs, 10);
-            progress = true;
-        }
-
-        value = std::clamp(value, 1, 149);
-        setValue(problemI, problemJ, value);
-        store();
-    }
-
-    return progress;
+int Stats::toIndex(int x, int y) {
+    return (y - tableMin) * tableSize + (x - tableMin);
 }
 
-void Stats::load() {
-    table = deSerializeVector(Settings::getStats());
-    if (table.size() != tableSize()) {
-        qDebug() << "can't load stats";
-        fill();
-    }
+QPair<int, int> Stats::fromIndex(int index) {
+    // convert index to x, y pair in main table
+    int x = index % tableSize;
+    int y = index / tableSize;
+    return QPair<int, int>(x + tableMin, y + tableMin);
 }
 
-void Stats::store() { Settings::setStats(serializeVector(instance().table)); }
+int Stats::getValue(int x, int y) { return instance().operator()(x, y); }
+
+void Stats::setValue(int x, int y, int value) {
+    instance().operator()(x, y) = value;
+    instance().store();
+}
 
 void Stats::print() {
-    qDebug() << "----------------------------";
-    for (int j = 2; j <= table_side; j++) {
-        for (int i = 2; i <= table_side; i++) {
-            std::cout << getValue(i, j) << "\t";
+    std::cout << "------------------------" << std::endl;
+    for (int y = tableMin; y <= tableMax; y++) {
+        for (int x = tableMin; x <= tableMax; x++) {
+            std::cout << std::setw(4) << getValue(x, y);
         }
         std::cout << std::endl;
     }
-    qDebug() << "----------------------------";
-    for (int i = 0; i < tableSize(); i++) {
-        std::cout << i << ":" << instance().table[i] << ", ";
-    }
-    std::cout << std::endl;
 }
 
-void Stats::fill() {
-    std::fill(std::begin(table), std::end(table), 60);
-    //    for (int i=0; i<table.size(); i++)
-    //        table[i] = static_cast<double>(i)/table.size()*80+40;
-}
-
-int Stats::toIndex(int i, int j) {
-    if ((i < 2 || i > table_side) | (j < 2 || j > table_side)) {
-        qDebug() << "incorrect indexes" << i << j;
-        return 0;
+void Stats::deleteStats() {
+    // TODO separate fill func
+    QVector<int> reducedTable;
+    constexpr int reducedTableSize = tableSize * (tableSize + 1) / 2;
+    if (reducedTable.size() != reducedTableSize) {
+        reducedTable.resize(reducedTableSize);
+        constexpr int lowerLevel = 1;
+        reducedTable.fill(lowerLevel);
     }
 
-    if (i > j)
-        std::swap(i, j); // we work with bottom-left part of the table only. The
-                         // top-right part is a mirror of bottom-left
-
-    return tableSize(j) - (j - i + 1);
+    instance().store();
 }
 
-std::pair<int, int> Stats::fromIndex(int index) {
-    static bool isInit = false;
-    static QVector<std::pair<int, int>> table_index;
-    if (!isInit) {
-        for (int kj = 2; kj <= table_side; kj++)
-            for (int ki = 2; ki <= kj; ki++)
-                table_index.push_back(std::make_pair(ki, kj));
-        isInit = true;
+// choose random element in subtable
+QPair<int, int> Stats::getRandom(int subTableMin, int subTableMax,
+                                 bool intelMode) {
+    QVector<int> subTable(instance().tableProb);
+
+    // fill cells outside of subtable with 0 probability
+    for (int y = tableMin; y <= tableMax; y++) {
+        for (int x = y; x <= tableMax; x++) {
+            if ((x < subTableMin || x > subTableMax) ||
+                (y < subTableMin || y > subTableMax))
+                subTable[toIndex(x, y)] = 0;
+            else if (!intelMode)
+                subTable[toIndex(x, y)] = 1;
+        }
     }
 
-    std::pair<int, int> result{2, 2};
-    if (index > 0 || index < tableSize())
-        result = table_index[index];
-    else
-        qDebug() << "incorrect index" << index;
-    return result;
+    // get index of random cell
+    std::discrete_distribution desc_dist(std::begin(subTable),
+                                         std::end(subTable));
+    int index = desc_dist(instance().generator);
+    auto coord = fromIndex(index);
+
+    // x always bigger than y due to top-right table. Randomize it!
+    std::uniform_int_distribution<int> uniform_dist(0, 1);
+    if (uniform_dist(instance().generator))
+        std::swap(coord.first, coord.second);
+
+    return coord;
 }
 
-int Stats::getValue(int i, int j) { return instance().table[toIndex(i, j)]; }
+bool Stats::updateProbability(int x, int y, int timeAnswer, bool hintShowed) {
+    // level of probability
+    constexpr int upperLevel = 999;
+    constexpr int lowerLevel = 1;
+    constexpr int rangeLevel = upperLevel - lowerLevel;
+    int relativeLevel = getValue(x, y) - lowerLevel;
 
-void Stats::setValue(int i, int j, int value) {
-    instance().table[toIndex(i, j)] = value;
-}
+    // time limit in decisec
+    constexpr int upperTimeLimit = 100;
+    constexpr int lowerTimeLimit = 20;
+    constexpr int rangeTimeLimit = upperTimeLimit - lowerTimeLimit;
+    double timeLimitCoef = -1.0 / rangeLevel * relativeLevel + 1.0;
+    int timeLimitCur = lowerTimeLimit + timeLimitCoef * rangeTimeLimit;
 
-QVector<int> Stats::getShrinkedTable(int table_side_from, int table_side_to,
-                                     bool intelMode) {
-    QVector<int> temp = instance().table;
-    for (int j = 2; j <= table_side; j++)
-        for (int i = j; i <= table_side; i++)
-            if ((i < table_side_from && j < table_side_from) ||
-                (i > table_side_to || j > table_side_to)) {
-                temp[toIndex(i, j)] = 0;
-            } else if (intelMode == false)
-                temp[toIndex(i, j)] = 1;
+    // rise power (in case of timeAnswer <= timeLimitCur)
+    constexpr int upperRise = 50;
+    constexpr int lowerRise = 5;
+    constexpr int rangeRise = upperRise - lowerRise;
+    double riseCoef = -log(relativeLevel + 1) / log(rangeLevel + 1) + 1;
+    int riseCur = lowerRise + riseCoef * rangeRise;
 
-    return temp;
+    // fall power (in case of timeAnswer > timeLimitCur)
+    constexpr int upperFall = -50;
+    constexpr int lowerFall = -5;
+    constexpr int rangeFall = upperFall - lowerFall;
+    double fallCoef =
+        1.0 / (rangeLevel * rangeLevel) * (relativeLevel * relativeLevel);
+    int fallCur = lowerFall + fallCoef * rangeFall;
+
+    // multiply time of answer if hint have been used
+    constexpr double hintShowedCoef = 2.0;
+    if (hintShowed)
+        timeAnswer *= hintShowedCoef;
+
+    // update level in the probability table
+    int newLevel;
+    bool progress;
+    if (timeAnswer <= timeLimitCur) {
+        newLevel = lowerLevel + relativeLevel + riseCur;
+        progress = true;
+    } else {
+        newLevel = lowerLevel + relativeLevel + fallCur;
+        progress = false;
+    }
+    newLevel = std::clamp(newLevel, lowerLevel, upperLevel);
+    setValue(x, y, newLevel);
+
+    return progress;
 }
