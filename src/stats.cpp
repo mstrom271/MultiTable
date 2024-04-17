@@ -7,14 +7,13 @@
 #include <sstream>
 
 void Stats::load() {
-    tableProb.resize(tableSize * tableSize);
-    tableProb.fill(0);
+    tableStats.resize(tableSize * tableSize);
+    tableStats.fill(0);
 
     QVector<int> reducedTable = deSerializeVector(Settings::getStats());
     constexpr int reducedTableSize = tableSize * (tableSize + 1) / 2;
     if (reducedTable.size() != reducedTableSize) {
         reducedTable.resize(reducedTableSize);
-        constexpr int lowerLevel = 1;
         reducedTable.fill(lowerLevel);
     }
 
@@ -45,7 +44,7 @@ Stats &Stats::instance() {
 int &Stats::operator()(int x, int y) {
     if (x < y)
         std::swap(x, y);
-    return tableProb[toIndex(x, y)];
+    return tableStats[toIndex(x, y)];
 }
 
 int Stats::min() { return instance().tableMin; }
@@ -98,7 +97,7 @@ void Stats::deleteStats() {
 // choose random element in subtable
 QPair<int, int> Stats::getRandom(int subTableMin, int subTableMax,
                                  bool intelMode) {
-    QVector<int> subTable(instance().tableProb);
+    QVector<int> subTable(instance().tableStats);
 
     // fill cells outside of subtable with 0 probability
     for (int y = tableMin; y <= tableMax; y++) {
@@ -107,7 +106,11 @@ QPair<int, int> Stats::getRandom(int subTableMin, int subTableMax,
                 (y < subTableMin || y > subTableMax))
                 subTable[toIndex(x, y)] = 0;
             else if (!intelMode)
-                subTable[toIndex(x, y)] = 1;
+                subTable[toIndex(x, y)] = lowerLevel;
+            else
+                // turn upside down to get probability
+                subTable[toIndex(x, y)] =
+                    upperLevel - subTable[toIndex(x, y)] + lowerLevel;
         }
     }
 
@@ -125,16 +128,13 @@ QPair<int, int> Stats::getRandom(int subTableMin, int subTableMax,
     return coord;
 }
 
-bool Stats::updateProbability(int x, int y, int timeAnswer, bool hintShowed) {
-    // level of probability
-    constexpr int upperLevel = 999;
-    constexpr int lowerLevel = 1;
-    constexpr int rangeLevel = upperLevel - lowerLevel;
+bool Stats::update(int x, int y, int timeAnswer, bool hintShowed) {
+    // level of knowladge
     int relativeLevel = getValue(x, y) - lowerLevel;
 
     // time limit in decisec
-    constexpr int upperTimeLimit = 100;
-    constexpr int lowerTimeLimit = 20;
+    constexpr int upperTimeLimit = 50;
+    constexpr int lowerTimeLimit = 10;
     constexpr int rangeTimeLimit = upperTimeLimit - lowerTimeLimit;
     double timeLimitCoef = -1.0 / rangeLevel * relativeLevel + 1.0;
     int timeLimitCur = lowerTimeLimit + timeLimitCoef * rangeTimeLimit;
@@ -159,7 +159,7 @@ bool Stats::updateProbability(int x, int y, int timeAnswer, bool hintShowed) {
     if (hintShowed)
         timeAnswer *= hintShowedCoef;
 
-    // update level in the probability table
+    // update level in the stats table
     int newLevel;
     bool progress;
     if (timeAnswer <= timeLimitCur) {
@@ -172,5 +172,7 @@ bool Stats::updateProbability(int x, int y, int timeAnswer, bool hintShowed) {
     newLevel = std::clamp(newLevel, lowerLevel, upperLevel);
     setValue(x, y, newLevel);
 
+    qDebug() << "progress: " << progress << ", timeAnswer: " << timeAnswer
+             << ", newLevel: " << newLevel;
     return progress;
 }

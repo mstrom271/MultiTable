@@ -42,7 +42,6 @@ QString Theme::getEffectiveTheme() {
     if (theme == "System") {
         return getSystemTheme();
     }
-    qDebug() << theme;
     return theme;
 }
 

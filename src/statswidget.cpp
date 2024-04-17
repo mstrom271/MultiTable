@@ -62,14 +62,14 @@ void StatsWidget::paintEvent(QPaintEvent *event) {
 
     for (int i = 2; i <= Stats::max(); i++) {
         for (int j = 2; j <= Stats::max(); j++) {
-            double color_inc = (Stats::getValue(i, j)) / 998.0;
+            double color_inc = (Stats::getValue(i, j)) / 999.0;
             QColor color;
             if (color_inc < 0.5) {
-                color = QColor(0, 255, 0,
-                               std::fmin((1 - color_inc / 0.5) * 255, 255));
-            } else {
                 color = QColor(255, 0, 0,
-                               std::fmin(((color_inc - 0.5) / 0.5) * 255, 255));
+                               std::fmin((1 - color_inc * 2) * 255, 255));
+            } else {
+                color = QColor(0, 255, 0,
+                               std::fmin(((color_inc - 0.5) * 2) * 255, 255));
             }
 
             painter.fillRect((i - 1) * cellSide + cellSide * 0.1 + corner.x(),

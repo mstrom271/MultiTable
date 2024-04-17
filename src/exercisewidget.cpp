@@ -226,9 +226,8 @@ void ExerciseWidget::clicked_number() {
                 duration_cast<deciseconds>(now.time_since_epoch()).count() -
                 timer_problem;
 
-            Stats::updateProbability(problemIndexes.first,
-                                     problemIndexes.second, decisecs,
-                                     promptShowed);
+            Stats::update(problemIndexes.first, problemIndexes.second, decisecs,
+                          promptShowed);
 
             answerLabel->setText("<p>" + answersText + ":</p><p>" +
                                  QString::number(++answers) + "</p>");

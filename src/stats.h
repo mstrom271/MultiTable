@@ -14,7 +14,11 @@ class Stats {
     static constexpr int tableMax = 12;
     static constexpr int tableSize = tableMax + 1 - tableMin;
 
-    QVector<int> tableProb; // table of probability
+    static constexpr int upperLevel = 999;
+    static constexpr int lowerLevel = 1;
+    static constexpr int rangeLevel = upperLevel - lowerLevel;
+
+    QVector<int> tableStats; // table of knowledge
     std::default_random_engine generator;
 
     Stats();
@@ -30,8 +34,7 @@ class Stats {
 
     static std::pair<int, int> getRandom(int subTableMin, int subTableMax,
                                          bool intelMode);
-    static bool updateProbability(int x, int y, int timeAnswer,
-                                  bool hintShowed);
+    static bool update(int x, int y, int timeAnswer, bool hintShowed);
 
     static int min();
     static int max();
